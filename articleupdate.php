@@ -1,0 +1,294 @@
+<?php
+$nameValue = "";
+$priceValue = "";
+$category_idValue = "";
+
+$errorMesage = "";
+$successMesage = "";
+
+// Include the connection file
+include('connection.php');
+
+// Create an instance of the Connection class
+$connection = new Connection();
+
+// Call the selectDatabase method
+$connection->selectDatabase('projet');
+
+// Include the articles file
+include('articles.php');
+
+if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+
+    if (isset($_GET['article_id'])) {
+        $id = $_GET['article_id'];
+
+        // Call the static selectArticleById method and store the result in $row
+        $row = articles::selectArticleById('articles', $connection->conn, $id);
+
+        // Check if the keys exist before using them
+        $nameValue = isset($row["article_name"]) ? $row["article_name"] : "";
+        $priceValue = isset($row["price"]) ? $row["price"] : "";
+        $category_idValue = isset($row["category_id"]) ? $row["category_id"] : "";
+    } else {
+        // Handle the case where $_GET['article_id'] is not defined
+        // ...
+    }
+
+} else if (isset($_POST["submit"])) {
+
+    $nameValue = $_POST["article_name"];
+    $priceValue = $_POST["price"];
+    $category_idValue = $_POST["category_id"];
+
+    if (empty($priceValue) || empty($nameValue)) {
+        $errorMesage = "Tous les champs doivent être remplis!";
+    } else {
+        // Create a new instance with the input values
+        $article = new articles($nameValue, $priceValue, $category_idValue);
+
+        // Check if article_id is set before updating
+        if (isset($_GET['article_id'])) {
+            // Call the static updateArticle method and pass the parameters
+            articles::updateArticle($article, 'articles', $connection->conn, $_GET['article_id']);
+            $successMesage = "Article updated successfully!";
+        }
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Admin Dashboard | Korsat X Parmaga</title>
+    <!-- ======= Styles ====== -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+
+
+input[type=text],input[type=email],input[type=password], select, textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin-top: 6px;
+  margin-bottom: 16px;
+  resize: vertical;
+}
+
+input[type=submit] {
+  background-color: #04AA6D;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+.containerr {
+  border-radius: 5px;
+  padding: 20px;
+}
+
+/* Styles for success message */
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+/* Styles for error message */
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+/* Common styles for all alert messages */
+.alert {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+}
+
+/* Close button styles */
+.btn-close {
+    float: right;
+    font-size: 1.25rem;
+    font-weight: bold;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: 0.5;
+}
+
+</style>
+</head>
+
+<body>
+    <!-- =============== Navigation ================ -->
+    <div class="container">
+        <div class="navigation">
+            <ul>
+                <li>
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="logo-apple"></ion-icon>
+                        </span>
+                        <span class="title">
+                           <?php
+                            session_start();
+                            echo $_SESSION['firstname'] . ' ' . $_SESSION['lastname'];
+                            ?>
+                        </span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="home-outline"></ion-icon>
+                        </span>
+                        <span class="title">Dashboard</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="userRead.php">
+                        <span class="icon">
+                            <ion-icon name="people-outline"></ion-icon>
+                        </span>
+                        <span class="title">Users</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <span class="icon">
+                        <ion-icon name="person-outline"></ion-icon>
+                        </span>
+                        <span class="title">Clients</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <span class="icon">
+                        <ion-icon name="cart-outline"></ion-icon>
+                        </span>
+                        <span class="title">Articles</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="receipt-outline"></ion-icon>
+                        </span>
+                        <span class="title">Devis</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="signout.php">
+                        <span class="icon">
+                            <ion-icon name="log-out-outline"></ion-icon>
+                        </span>
+                        <span class="title">Sign Out</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- ========================= Main ==================== -->
+        <div class="main">
+            <div class="topbar">
+                <div class="toggle">
+                    <ion-icon name="menu-outline"></ion-icon>
+                </div>
+
+                
+            </div>
+
+        <div class="containerr">
+            <form method="post" action="">
+            <div class="row mb-3">
+            </div>
+
+                <label for="firstname">Name</label>
+                <input value="<?php echo $nameValue ?>" type="text" id="name" name="article_name" placeholder="name..">
+
+                <label for="lastname">price</label>
+                <input value="<?php echo $priceValue ?>" type="text" id="price" name="price" placeholder="price..">
+
+             
+                <select name='category_id' class="form-select">
+                        <option value="" selected>Select the category</option>
+                        <?php
+                        // Include the file with the database connection
+                       
+                        include('categories.php');
+
+                        // Create an instance of the Connection class
+                        $connection = new Connection();
+
+                        // Select the database
+                        $connection->selectDatabase('projet');
+
+                        // Get the connection property
+                        
+
+                        $categories = categorie::selectAllCategories('categories', $connection->conn);
+
+                        foreach ($categories  as $category) {
+                            echo "<option value='$category[category_id]'>$category[category_name]</option>";
+                        }
+                        ?>
+                    </select>
+
+                <?php
+            if (!empty($successMesage)) {
+                echo "<div class='alert alert-success alert-dismissible fade show' role='alert'>
+                    <strong>$successMesage</strong>
+                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'>
+                    </button>
+                    </div>";
+            }
+
+            if (!empty($errorMesage)) {
+                echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
+                    <strong>$errorMesage</strong>
+                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'>
+                    </button>
+                    </div>";
+            }
+            ?>
+
+                <input name="submit" type="submit" value="Submit">
+                <a class='status return' href='articleread.php' style="padding: 12px ;">Cancel</a>
+            </form>
+        </div>
+
+        </div>
+    </div>
+
+    <!-- =========== Scripts =========  -->
+    <script src="assets/js/main.js"></script>
+
+    <!-- ====== ionicons ======= -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
+
+
+</html>
